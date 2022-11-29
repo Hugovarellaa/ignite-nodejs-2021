@@ -1,0 +1,12 @@
+{
+  "name": "chapter-01",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}
