@@ -55,4 +55,20 @@ app.get('/statement', verifyExistsAccountCpf, (request, response) => {
     return response.json(customer.statement)
 })
 
+app.post('/deposit', verifyExistsAccountCpf, (request, response) => {
+    const { customer } = request
+    const { description, amount } = request.body
+
+    customer.statement.push({
+        description,
+        amount,
+        created_at: new Date(),
+        type: 'credit'
+    })
+
+    return response
+        .status(201)
+        .send({ message: 'Account deposit was a success' })
+})
+
 app.listen(3333, () => console.log('Listening on port 3333'))
