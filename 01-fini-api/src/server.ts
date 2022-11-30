@@ -146,4 +146,12 @@ app.get('/account', verifyExistsAccountCpf, (request, response) => {
     return response.json(customer)
 })
 
+app.delete('/account', verifyExistsAccountCpf, (request, response) => {
+    const { customer } = request
+
+    customers.splice(Number(customer), 1)
+
+    return response.json(customer)
+})
+
 app.listen(3333, () => console.log('Listening on port 3333'))
