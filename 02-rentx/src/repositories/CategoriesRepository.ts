@@ -21,6 +21,12 @@ class CategoriesRepository {
 
     this.categories.push(category)
   }
+  findByName(name: string) {
+    const categoryAlreadyExists = this.categories.find(
+      (category) => category.name === name
+    )
+    return categoryAlreadyExists
+  }
 }
 
 export { CategoriesRepository }
