@@ -40,6 +40,10 @@ app.get('/statement', (request, response) => {
 
     const customer = customers.find((customer) => customer.cpf === cpf)
 
+    if (!customer) {
+        return response.status(400).send({ message: 'Customer not found' })
+    }
+
     return response.json(customer.statement)
 })
 
