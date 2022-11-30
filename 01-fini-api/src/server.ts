@@ -154,4 +154,12 @@ app.delete('/account', verifyExistsAccountCpf, (request, response) => {
     return response.json(customer)
 })
 
+app.get('/balance', verifyExistsAccountCpf, (request, response) => {
+    const { customer } = request
+
+    const balance = getBalancer(customer)
+
+    return response.json(`Seu saldo é ${balance}`)
+})
+
 app.listen(3333, () => console.log('Listening on port 3333'))
