@@ -13,6 +13,20 @@ type Account = {
 
 const customers: Account = []
 
+// Middleware
+function verifyExistsAccountCpf(request, response, next) {
+    const { cpf } = request.headers
+
+    const customer = customers.find((customer) => customer.cpf === cpf)
+    if (!customer) {
+        return response.status(400).send({ message: 'Customer not found' })
+    }
+
+    request.customer = customer
+
+    return next()
+}
+
 app.post('/account', (request, response) => {
     const { name, cpf } = request.body
 
@@ -35,14 +49,8 @@ app.post('/account', (request, response) => {
     return response.status(201).json(account)
 })
 
-app.get('/statement', (request, response) => {
-    const { cpf } = request.headers
-
-    const customer = customers.find((customer) => customer.cpf === cpf)
-
-    if (!customer) {
-        return response.status(400).send({ message: 'Customer not found' })
-    }
+app.get('/statement', verifyExistsAccountCpf, (request, response) => {
+    const { customer } = request
 
     return response.json(customer.statement)
 })
