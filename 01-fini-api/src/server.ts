@@ -1,6 +1,8 @@
 import express from 'express'
 import { v4 as uuidV4 } from 'uuid'
 
+import { ICustomerDTO } from './dtos/Customer'
+
 const app = express()
 app.use(express.json())
 
@@ -25,6 +27,16 @@ function verifyExistsAccountCpf(request, response, next) {
     request.customer = customer
 
     return next()
+}
+
+function getBalancer(customer: ICustomerDTO) {
+    const balance = customer.statement.reduce((acc, operation) => {
+        if (operation.type === 'credit') {
+            return acc + operation.amount
+        }
+        return acc - operation.amount
+    }, 0)
+    return balance
 }
 
 app.post('/account', (request, response) => {
@@ -69,6 +81,26 @@ app.post('/deposit', verifyExistsAccountCpf, (request, response) => {
     return response
         .status(201)
         .send({ message: 'Account deposit was a success' })
+})
+
+app.post('/withdraw', verifyExistsAccountCpf, (request, response) => {
+    const { customer } = request
+    const { description, amount } = request.body
+
+    const balance = getBalancer(customer)
+
+    if (amount > balance) {
+        return response.status(400).json({ message: 'insufficient funds!' })
+    }
+
+    customer.statement.push({
+        description,
+        amount,
+        created_at: new Date(),
+        type: 'debit'
+    })
+
+    return response.json(customer.statement)
 })
 
 app.listen(3333, () => console.log('Listening on port 3333'))
