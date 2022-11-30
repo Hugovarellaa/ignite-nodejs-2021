@@ -11,10 +11,18 @@ type Account = {
     statement: string[]
 }
 
-const customer = []
+const customers = []
 
 app.post('/account', (request, response) => {
     const { name, cpf } = request.body
+
+    const accountAlreadyExists = customers.some(
+        (customer) => customer.cpf === cpf
+    )
+
+    if (accountAlreadyExists) {
+        return response.status(400).json({ message: 'Account already exists' })
+    }
 
     const account: Account = {
         id: uuidV4(),
@@ -23,7 +31,7 @@ app.post('/account', (request, response) => {
         statement: []
     }
 
-    customer.push(account)
+    customers.push(account)
     return response.status(201).json(account)
 })
 
