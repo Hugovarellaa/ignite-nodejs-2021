@@ -13,7 +13,7 @@
 
 ## Regras de negócio
 
-[] Não deve ser possível cadastrar uma conta com CPF já existente<br/>
+[x] Não deve ser possível cadastrar uma conta com CPF já existente<br/>
 [] Não deve ser possível fazer depósito em uma conta não existente<br/>
 [] Não deve ser possível buscar extrato em uma conta não existente<br/>
 [] Não deve ser possível fazer saque em uma conta não existente<br/>
