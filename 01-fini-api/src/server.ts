@@ -103,4 +103,22 @@ app.post('/withdraw', verifyExistsAccountCpf, (request, response) => {
     return response.json(customer.statement)
 })
 
+app.get('/statement/date', verifyExistsAccountCpf, (request, response) => {
+    const { date } = request.query
+    const { customer } = request
+
+    const dateFormatted = new Date(`${date} 00:00`)
+
+    const statement = customer.statement.filter(
+        (statement) =>
+            statement.created_at.toDateString() ===
+            new Date(dateFormatted).toDateString()
+    )
+
+    console.log(dateFormatted)
+    console.log(statement)
+
+    return response.json(statement)
+})
+
 app.listen(3333, () => console.log('Listening on port 3333'))
