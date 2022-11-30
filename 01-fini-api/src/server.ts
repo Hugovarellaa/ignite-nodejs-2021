@@ -24,7 +24,6 @@ app.post('/account', (request, response) => {
     }
 
     customer.push(account)
-
     return response.status(201).json(account)
 })
 
