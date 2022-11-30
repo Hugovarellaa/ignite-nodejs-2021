@@ -9,9 +9,9 @@ type Account = {
     name: string
     cpf: string
     statement: string[]
-}
+}[]
 
-const customers = []
+const customers: Account = []
 
 app.post('/account', (request, response) => {
     const { name, cpf } = request.body
@@ -24,7 +24,7 @@ app.post('/account', (request, response) => {
         return response.status(400).json({ message: 'Account already exists' })
     }
 
-    const account: Account = {
+    const account = {
         id: uuidV4(),
         name,
         cpf,
