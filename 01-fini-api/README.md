@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-[] Deve ser possível criar umma conta <br/>
+[x] Deve ser possível criar umma conta <br/>
 [] Deve ser possível buscar o extrato bancário do cliente <br/>
 [] Deve ser possível realizar um depósito <br/>
 [] Deve ser possível realizar um saque <br/>
