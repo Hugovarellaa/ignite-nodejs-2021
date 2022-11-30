@@ -21,6 +21,11 @@ class CategoriesRepository {
 
     this.categories.push(category)
   }
+
+  list(): Category[] {
+    return this.categories
+  }
+
   findByName(name: string) {
     const categoryAlreadyExists = this.categories.find(
       (category) => category.name === name
