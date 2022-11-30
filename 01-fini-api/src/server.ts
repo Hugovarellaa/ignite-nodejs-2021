@@ -1,8 +1,6 @@
 import express from 'express'
 import { v4 as uuidV4 } from 'uuid'
 
-import { ICustomerDTO } from './dtos/Customer'
-
 const app = express()
 app.use(express.json())
 
@@ -12,6 +10,18 @@ type Account = {
     cpf: string
     statement: string[]
 }[]
+
+interface ICustomerDTO {
+    id: string
+    name: string
+    cpf: string
+    statement: {
+        description: string
+        amount: number
+        created_at: Date
+        type: 'debit' | 'credit'
+    }[]
+}
 
 const customers: Account = []
 
@@ -119,6 +129,21 @@ app.get('/statement/date', verifyExistsAccountCpf, (request, response) => {
     console.log(statement)
 
     return response.json(statement)
+})
+
+app.put('/account', verifyExistsAccountCpf, (request, response) => {
+    const { customer } = request
+    const { name } = request.body
+
+    customer.name = name
+
+    return response.send()
+})
+
+app.get('/account', verifyExistsAccountCpf, (request, response) => {
+    const { customer } = request
+
+    return response.json(customer)
 })
 
 app.listen(3333, () => console.log('Listening on port 3333'))
