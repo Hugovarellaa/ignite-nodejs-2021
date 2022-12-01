@@ -1,0 +1,3 @@
+class ImportCategoryUseCase {}
+
+export { ImportCategoryUseCase }
