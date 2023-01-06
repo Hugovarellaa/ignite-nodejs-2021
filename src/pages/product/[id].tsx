@@ -4,28 +4,71 @@ import {
   ProductImageContainer,
 } from "../../styles/pages/product";
 
+import { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
-import img from "../../assets/img03.png";
+import Stripe from "stripe";
+import { stripe } from "../../lib/stripe";
 
-export default function Product() {
+interface ProductProps {
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    imagesUrl: string;
+    price: string;
+  };
+}
+
+export default function Product({ product }: ProductProps) {
   return (
     <ProductContainer>
       <ProductImageContainer>
-        <Image src={img} alt="camisa" />
+        <Image src={product.imagesUrl} alt={product.name} />
       </ProductImageContainer>
 
       <ProductDetails>
-        <h1>Camiseta x</h1>
+        <h1>{product.name}</h1>
 
-        <span>R$ 79,90</span>
+        <span>{product.price}</span>
 
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut iste ipsam
-          sed non sapiente, incidunt nulla quia unde est. Doloremque distinctio
-          cum, alias beatae provident placeat ad asperiores vel enim.
-        </p>
+        <p>{product.description}</p>
         <button>Comprar agora</button>
       </ProductDetails>
     </ProductContainer>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
+  params,
+}) => {
+  const productId = params.id;
+
+  const product = await stripe.products.retrieve(productId, {
+    expand: ["default_price"],
+  });
+
+  const price = product.default_price as Stripe.Price;
+
+  return {
+    props: {
+      product: {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        imagesUrl: product.images[0],
+        price: new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(price.unit_amount / 100),
+      },
+    },
+    revalidate: 60 * 60 * 24, // 24 hours
+  };
+};
