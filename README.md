@@ -1,5 +1,5 @@
 <div>
-  <img src="./src/assets/Capa.png" width="720p">
+  <img src="./src/assets/Capa.png" width="100%">
 </div>
 
 <br/>
