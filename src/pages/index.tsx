@@ -1,11 +1,12 @@
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
-import Image from "next/image";
-import { HomeContainer, HomeProduct } from "../styles/pages/home";
-
 import { GetStaticProps } from "next";
+import Head from "next/head";
+import Image from "next/image";
+import Link from "next/link";
 import Stripe from "stripe";
 import { stripe } from "../lib/stripe";
+import { HomeContainer, HomeProduct } from "../styles/pages/home";
 
 interface HomeProps {
   products: {
@@ -13,7 +14,7 @@ interface HomeProps {
     name: string;
     description: string;
     imagesUrl: string;
-    price: number;
+    price: string;
   }[];
 }
 
@@ -27,20 +28,30 @@ export default function Home({ products }: HomeProps) {
 
   return (
     <>
+      <Head>
+        <title>Ignite Shop</title>
+      </Head>
+
       <HomeContainer ref={sliderRef} className="keen-slider">
         {products.map((product) => (
-          <HomeProduct className="keen-slider__slide" key={product.id}>
-            <Image
-              src={product.imagesUrl}
-              alt="camiseta01"
-              width={520}
-              height={480}
-            />
-            <footer>
-              <strong>{product.name}</strong>
-              <span>{product.price}</span>
-            </footer>
-          </HomeProduct>
+          <Link
+            key={product.id}
+            href={`/product/${product.id}`}
+            prefetch={false}
+          >
+            <HomeProduct className="keen-slider__slide">
+              <Image
+                src={product.imagesUrl}
+                alt="camiseta01"
+                width={520}
+                height={480}
+              />
+              <footer>
+                <strong>{product.name}</strong>
+                <span>{product.price}</span>
+              </footer>
+            </HomeProduct>
+          </Link>
         ))}
       </HomeContainer>
     </>
@@ -59,7 +70,10 @@ export const getStaticProps: GetStaticProps = async () => {
       name: product.name,
       description: product.description,
       imagesUrl: product.images[0],
-      price: price.unit_amount! / 100,
+      price: new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(price.unit_amount! / 100),
     };
   });
 
