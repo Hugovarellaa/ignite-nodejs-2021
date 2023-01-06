@@ -4,8 +4,10 @@ import {
   ProductImageContainer,
 } from "../../styles/pages/product";
 
+import axios from "axios";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
+import { useState } from "react";
 import Stripe from "stripe";
 import { stripe } from "../../lib/stripe";
 
@@ -16,14 +18,41 @@ interface ProductProps {
     description: string;
     imagesUrl: string;
     price: string;
+    defaultPrice: string;
   };
 }
 
 export default function Product({ product }: ProductProps) {
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false);
+
+  async function handleByProduct() {
+    try {
+      setIsCreatingCheckoutSession(true);
+      const response = await axios.post("/api/checkout", {
+        priceId: product.defaultPrice,
+      });
+
+      const { checkoutUrl } = response.data;
+
+      window.location.href = checkoutUrl;
+    } catch (err) {
+      alert("Falha ao redirecionar ao checkout!");
+      // Conectar com uma ferramenta de observabilidade (Datadog / Sentry)
+      console.log(err);
+      setIsCreatingCheckoutSession(false);
+    }
+  }
+
   return (
     <ProductContainer>
       <ProductImageContainer>
-        <Image src={product.imagesUrl} alt={product.name} />
+        <Image
+          src={product.imagesUrl}
+          alt={product.name}
+          width={520}
+          height={480}
+        />
       </ProductImageContainer>
 
       <ProductDetails>
@@ -32,7 +61,9 @@ export default function Product({ product }: ProductProps) {
         <span>{product.price}</span>
 
         <p>{product.description}</p>
-        <button>Comprar agora</button>
+        <button onClick={handleByProduct} disabled={isCreatingCheckoutSession}>
+          Comprar agora
+        </button>
       </ProductDetails>
     </ProductContainer>
   );
@@ -41,7 +72,9 @@ export default function Product({ product }: ProductProps) {
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
-    fallback: "blocking",
+    fallback: "blocking", // -> Deixa a tela em branco ate ela carregar                ** Menos usado **
+    // fallback: true,   -> parar cria o Skeleton componential com o estado de loading ** Mais usado **
+    // fallback: false , -> So carregar as paginas que foi builded nos paths
   };
 };
 
@@ -67,6 +100,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
           style: "currency",
           currency: "BRL",
         }).format(price.unit_amount / 100),
+        defaultPrice: price.id,
       },
     },
     revalidate: 60 * 60 * 24, // 24 hours
